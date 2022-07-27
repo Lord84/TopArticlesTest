@@ -8,6 +8,7 @@ namespace TopArticlesTest.Models
 {
     public class ArticleModel
     {
+        public string article_name { get; set; }
         public string title { get; set; }
         public string url { get; set; }
         public string author { get; set; }

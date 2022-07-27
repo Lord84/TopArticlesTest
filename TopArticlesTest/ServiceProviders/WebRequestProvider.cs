@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using TopArticlesTest.Models;
 
-namespace TopArticlesTest.ServiceProvider
+namespace TopArticlesTest.ServiceProviders
 {    
     public class WebRequestProvider
     {
@@ -37,31 +38,7 @@ namespace TopArticlesTest.ServiceProvider
 
             if (!string.IsNullOrWhiteSpace(content))
             {
-                try
-                {
-                    var key = nameof(ReplyModel.Message).ToLower();
-                    var contentData = JObject.Parse(content);
-                    if (contentData.ContainsKey(key))
-                    {
-                        var keyValue = (string)contentData[key];
-                        if (!string.IsNullOrWhiteSpace(keyValue))
-                        {
-                            message = $"{statusCode}: {keyValue}";
-                        }
-                        else
-                        {
-                            message = $"{statusCode}: Error message empty. Please contact the developer.";
-                        }
-                    }
-                    else
-                    {
-                        message = $"{statusCode}: {content}";
-                    }
-                }
-                catch (Exception ex)
-                {
-                    message = $"{statusCode}: {ex.InnerExceptionMessage() + Environment.NewLine}Error Message: {content}";
-                }
+                message = $"{statusCode}: {content}";
             }
             else
             {
@@ -71,9 +48,26 @@ namespace TopArticlesTest.ServiceProvider
             return message;
         }
 
-        public ArticlePageModel GetArticles(int pageNumber)
+        public async Task<(bool, string, ArticlePageModel)> GetArticles(int pageNumber)
         {
+            bool success;
+            string message = null;
+            ArticlePageModel results = null;
 
+            var response = await SendRequest(HttpMethod.Get, $"?page={pageNumber}");
+            var content = await response.Content.ReadAsStringAsync();
+
+            success = response.StatusCode == HttpStatusCode.OK;
+            if (success)
+            {
+                results = JsonConvert.DeserializeObject<ArticlePageModel>(content);
+            }
+            else
+            {
+                message = $"Failed getting articles on page {pageNumber}.{Environment.NewLine}Error Details:{Environment.NewLine}{GetErrorMessage(response.StatusCode, content)}";
+            }
+
+            return (success, message, results);
         }
     }
 }
