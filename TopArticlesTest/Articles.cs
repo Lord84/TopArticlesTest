@@ -42,7 +42,7 @@ namespace TopArticlesTest
                             {
                                 foreach (var article in articlePageModel.data)
                                 {
-                                    var articleName = article.title ?? article.story_title;
+                                    var articleName = string.IsNullOrEmpty(article.title) ? article.story_title : article.title;
 
                                     if (!string.IsNullOrEmpty(articleName))
                                     {
@@ -60,13 +60,6 @@ namespace TopArticlesTest
 
                         pageNumber++;
                     }
-                    
-                    //var a = articleData.OrderByDescending(i => i.num_comments)
-                    //    .ThenByDescending(i => i.article_name.ToLower())
-                    //    .Select(i => $"{i.num_comments.ToString().PadRight(6)} {i.article_name}")
-                    //    .ToArray();
-
-                    //Console.WriteLine(string.Join(Environment.NewLine, a));
 
                     topArticles = articleData
                         .OrderByDescending(i => i.num_comments)
