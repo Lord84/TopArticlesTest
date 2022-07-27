@@ -4,26 +4,30 @@ namespace TopArticlesTest
 {
     class Program
     {        
-        static async void Main(string[] args)
+        public static void Main(string[] args)
         {
-            if (args.Length > 0)
+            Console.WriteLine("Program started");
+
+            Console.Write("Enter limit (press x to exit): ");
+            var inputValue = Console.ReadLine();
+
+            while (!inputValue.Equals("x", StringComparison.OrdinalIgnoreCase))
             {
-                var successful = int.TryParse(args[0], out int limit);
+                var successful = int.TryParse(inputValue, out int limit);
                 if (successful)
                 {
                     var articles = new Articles();
-                    var topArticles = await articles.TopArticles(limit);
+                    var topArticles = articles.TopArticles(limit).Result;
 
-                    Console.WriteLine(string.Join(Environment.NewLine, topArticles));
+                    Console.WriteLine(Environment.NewLine + "[Top Articles]" + Environment.NewLine + string.Join(Environment.NewLine, topArticles));
                 }
                 else
                 {
-                    Console.WriteLine("Invalid limit value");
+                    Console.WriteLine("Error: Invalid limit value");
                 }
-            }
-            else
-            {
-                Console.WriteLine("Limit not defined");
+
+                Console.Write(Environment.NewLine + "Enter limit (press x to exit): ");
+                inputValue = Console.ReadLine();
             }
         }
     }

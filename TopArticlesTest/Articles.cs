@@ -30,8 +30,9 @@ namespace TopArticlesTest
                     var pageNumber = 1;
                     var totalPages = 1;
 
-                    while (articleData.Count < limit && pageNumber <= totalPages)
+                    while (pageNumber <= totalPages)
                     {
+                        Console.WriteLine($"Fetching articles on page {pageNumber}...");
                         var (success, message, articlePageModel) = await WebRequestProvider.GetArticles(pageNumber);
                         if (success)
                         {
@@ -43,7 +44,7 @@ namespace TopArticlesTest
                                 {
                                     var articleName = article.title ?? article.story_title;
 
-                                    if (articleName != null)
+                                    if (!string.IsNullOrEmpty(articleName))
                                     {
                                         article.article_name = articleName;
                                         articleData.Add(article);
@@ -53,21 +54,31 @@ namespace TopArticlesTest
                         }
                         else
                         {
-                            Console.WriteLine(message);
+                            Console.WriteLine("Error: " + message);
                             break;
                         }
-                    }
 
-                    topArticles = articleData.Take(limit)
+                        pageNumber++;
+                    }
+                    
+                    //var a = articleData.OrderByDescending(i => i.num_comments)
+                    //    .ThenByDescending(i => i.article_name.ToLower())
+                    //    .Select(i => $"{i.num_comments.ToString().PadRight(6)} {i.article_name}")
+                    //    .ToArray();
+
+                    //Console.WriteLine(string.Join(Environment.NewLine, a));
+
+                    topArticles = articleData
                         .OrderByDescending(i => i.num_comments)
                         .ThenByDescending(i => i.article_name.ToLower())
+                        .Take(limit)
                         .Select(i => i.article_name)
                         .ToArray();
                 }
                 catch (Exception ex)
                 {
                     topArticles = Array.Empty<string>();
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine("Error: " + ex.Message + Environment.NewLine + "StackTrace:" + Environment.NewLine + ex.StackTrace);
                 }
             }
             else
