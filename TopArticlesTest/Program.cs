@@ -8,12 +8,11 @@ namespace TopArticlesTest
         {
             Console.WriteLine("Program started");
 
-            Console.Write("Enter limit (press x to exit): ");
-            var inputValue = Console.ReadLine();
+            var userInput = GetUserInput();
 
-            while (!inputValue.Equals("x", StringComparison.OrdinalIgnoreCase))
+            while (!userInput.Equals("x", StringComparison.OrdinalIgnoreCase))
             {
-                var successful = int.TryParse(inputValue, out int limit);
+                var successful = int.TryParse(userInput, out int limit);
                 if (successful)
                 {
                     var articles = new Articles();
@@ -26,9 +25,16 @@ namespace TopArticlesTest
                     Console.WriteLine("Error: Invalid limit value");
                 }
 
-                Console.Write(Environment.NewLine + "Enter limit (press x to exit): ");
-                inputValue = Console.ReadLine();
+                userInput = GetUserInput();
             }
+        }
+
+        public static string GetUserInput()
+        {
+            Console.Write("Enter limit (press x to exit): ");
+            var userInput = Console.ReadLine();
+
+            return userInput;
         }
     }
 }
